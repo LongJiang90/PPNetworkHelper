@@ -99,9 +99,10 @@ static AFHTTPSessionManager *_sessionManager;
 
 + (NSURLSessionTask *)GET:(NSString *)URL
                parameters:(NSDictionary *)parameters
+                  headers:(nullable NSDictionary <NSString *, NSString *> *)headers
                   success:(PPHttpRequestSuccess)success
                   failure:(PPHttpRequestFailed)failure {
-    return [self GET:URL parameters:parameters responseCache:nil success:success failure:failure];
+    return [self GET:URL parameters:parameters headers:headers responseCache:nil success:success failure:failure];
 }
 
 
@@ -109,9 +110,10 @@ static AFHTTPSessionManager *_sessionManager;
 
 + (NSURLSessionTask *)POST:(NSString *)URL
                 parameters:(NSDictionary *)parameters
+                   headers:(nullable NSDictionary <NSString *, NSString *> *)headers
                    success:(PPHttpRequestSuccess)success
                    failure:(PPHttpRequestFailed)failure {
-    return [self POST:URL parameters:parameters responseCache:nil success:success failure:failure];
+    return [self POST:URL parameters:parameters headers:headers responseCache:nil success:success failure:failure];
 }
 
 
@@ -122,10 +124,19 @@ static AFHTTPSessionManager *_sessionManager;
             responseCache:(PPHttpRequestCache)responseCache
                   success:(PPHttpRequestSuccess)success
                   failure:(PPHttpRequestFailed)failure {
+    return [self GET:URL parameters:parameters headers:nil responseCache:responseCache success:success failure:failure];
+}
+
++ (NSURLSessionTask *)GET:(NSString *)URL
+               parameters:(NSDictionary *)parameters
+                  headers:(nullable NSDictionary <NSString *, NSString *> *)headers
+            responseCache:(PPHttpRequestCache)responseCache
+                  success:(PPHttpRequestSuccess)success
+                  failure:(PPHttpRequestFailed)failure {
     //读取缓存
     responseCache ? responseCache([PPNetworkCache httpCacheForURL:URL parameters:parameters]) : nil;
     
-    NSURLSessionTask *sessionTask = [_sessionManager GET:URL parameters:parameters headers:nil progress:^(NSProgress * _Nonnull uploadProgress) {
+    NSURLSessionTask *sessionTask = [_sessionManager GET:URL parameters:parameters headers:headers progress:^(NSProgress * _Nonnull uploadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         PPLog(@"%@",_isOpenLog ? NSStringFormat(@"responseObject = %@",[self jsonToString:responseObject]) : @"PPNetworkHelper已关闭日志打印");
@@ -155,10 +166,19 @@ static AFHTTPSessionManager *_sessionManager;
              responseCache:(PPHttpRequestCache)responseCache
                    success:(PPHttpRequestSuccess)success
                    failure:(PPHttpRequestFailed)failure {
+    return [self POST:URL parameters:parameters headers:nil responseCache:responseCache success:success failure:failure];
+}
+
++ (NSURLSessionTask *)POST:(NSString *)URL
+                parameters:(NSDictionary *)parameters
+                   headers:(nullable NSDictionary <NSString *, NSString *> *)headers
+             responseCache:(PPHttpRequestCache)responseCache
+                   success:(PPHttpRequestSuccess)success
+                   failure:(PPHttpRequestFailed)failure {
     //读取缓存
     responseCache ? responseCache([PPNetworkCache httpCacheForURL:URL parameters:parameters]) : nil;
     
-    NSURLSessionTask *sessionTask = [_sessionManager POST:URL parameters:parameters headers:nil progress:^(NSProgress * _Nonnull uploadProgress) {
+    NSURLSessionTask *sessionTask = [_sessionManager POST:URL parameters:parameters headers:headers progress:^(NSProgress * _Nonnull uploadProgress) {
         
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         PPLog(@"%@",_isOpenLog ? NSStringFormat(@"responseObject = %@",[self jsonToString:responseObject]) : @"PPNetworkHelper已关闭日志打印");

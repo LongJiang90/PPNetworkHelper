@@ -122,6 +122,7 @@ typedef void(^PPNetworkStatus)(PPNetworkStatusType status);
  */
 + (__kindof NSURLSessionTask *)GET:(NSString *)URL
                         parameters:(id)parameters
+                           headers:(nullable NSDictionary <NSString *, NSString *> *)headers
                            success:(PPHttpRequestSuccess)success
                            failure:(PPHttpRequestFailed)failure;
 
@@ -138,6 +139,7 @@ typedef void(^PPNetworkStatus)(PPNetworkStatusType status);
  */
 + (__kindof NSURLSessionTask *)GET:(NSString *)URL
                         parameters:(id)parameters
+                           headers:(nullable NSDictionary <NSString *, NSString *> *)headers
                      responseCache:(PPHttpRequestCache)responseCache
                            success:(PPHttpRequestSuccess)success
                            failure:(PPHttpRequestFailed)failure;
@@ -154,8 +156,10 @@ typedef void(^PPNetworkStatus)(PPNetworkStatusType status);
  */
 + (__kindof NSURLSessionTask *)POST:(NSString *)URL
                          parameters:(id)parameters
+                            headers:(nullable NSDictionary <NSString *, NSString *> *)headers
                             success:(PPHttpRequestSuccess)success
                             failure:(PPHttpRequestFailed)failure;
+
 
 /**
  *  POST请求,自动缓存
@@ -173,6 +177,13 @@ typedef void(^PPNetworkStatus)(PPNetworkStatusType status);
                       responseCache:(PPHttpRequestCache)responseCache
                             success:(PPHttpRequestSuccess)success
                             failure:(PPHttpRequestFailed)failure;
+
++ (NSURLSessionTask *)POST:(NSString *)URL
+                parameters:(NSDictionary *)parameters
+                   headers:(nullable NSDictionary <NSString *, NSString *> *)headers
+             responseCache:(nullable PPHttpRequestCache)responseCache
+                   success:(nullable PPHttpRequestSuccess)success
+                   failure:(nullable PPHttpRequestFailed)failure;
 
 /**
  *  上传文件

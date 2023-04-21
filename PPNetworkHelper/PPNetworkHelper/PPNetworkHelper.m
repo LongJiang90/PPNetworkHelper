@@ -292,6 +292,61 @@ static AFHTTPSessionManager *_sessionManager;
     return sessionTask;
 }
 
+#pragma mark - 上传多张图片
+
++ (NSURLSessionTask *)uploadImagesWithURL:(NSString *)URL
+                               parameters:(NSDictionary *)parameters
+                                     name:(NSString *)name
+                                   images:(NSArray<UIImage *> *)images
+                                fileNames:(NSArray<NSString *> *)fileNames
+                               imageScale:(CGFloat)imageScale
+                                imageType:(NSString *)imageType
+                                  headers:(nullable NSDictionary <NSString *, NSString *> *)headers
+                                 progress:(PPHttpProgress)progress
+                                  success:(PPHttpRequestSuccess)success
+                                  failure:(PPHttpRequestFailed)failure {
+    NSURLSessionTask *sessionTask = [_sessionManager POST:URL parameters:parameters headers:headers constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        for (NSUInteger i = 0; i < images.count; i++) {
+            // 图片经过等比压缩后得到的二进制文件
+            NSData *imageData = UIImageJPEGRepresentation(images[i], imageScale ?: 1.f);
+            // 默认图片的文件名, 若fileNames为nil就使用
+            
+            NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+            formatter.dateFormat = @"yyyyMMddHHmmss";
+            NSString *str = [formatter stringFromDate:[NSDate date]];
+            NSString *imageFileName = NSStringFormat(@"%@%ld.%@",str,i,imageType?:@"jpg");
+            
+            [formData appendPartWithFileData:imageData
+                                        name:name
+                                    fileName:fileNames ? NSStringFormat(@"%@.%@",fileNames[i],imageType?:@"jpg") : imageFileName
+                                    mimeType:NSStringFormat(@"image/%@",imageType ?: @"jpg")];
+        }
+        
+    } progress:^(NSProgress * _Nonnull uploadProgress) {
+        //上传进度
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            progress ? progress(uploadProgress) : nil;
+        });
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        PPLog(@"%@",_isOpenLog ? NSStringFormat(@"responseObject = %@",[self jsonToString:responseObject]) : @"PPNetworkHelper已关闭日志打印");
+        
+        [[self allSessionTask] removeObject:task];
+        success ? success(responseObject) : nil;
+        
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        PPLog(@"%@",_isOpenLog ? NSStringFormat(@"error = %@",error) : @"PPNetworkHelper已关闭日志打印");
+        
+        [[self allSessionTask] removeObject:task];
+        failure ? failure(error) : nil;
+    }];
+    
+    // 添加sessionTask到数组
+    sessionTask ? [[self allSessionTask] addObject:sessionTask] : nil ;
+    
+    return sessionTask;
+}
+
 #pragma mark - 下载文件
 + (NSURLSessionTask *)downloadWithURL:(NSString *)URL
                               fileDir:(NSString *)fileDir

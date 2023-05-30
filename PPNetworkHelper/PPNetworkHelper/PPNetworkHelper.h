@@ -277,7 +277,22 @@ typedef void(^PPNetworkStatus)(PPNetworkStatusType status);
                                       progress:(PPHttpProgress)progress
                                        success:(void(^)(NSString *filePath))success
                                        failure:(PPHttpRequestFailed)failure;
-
+/**
+ *  下载文件
+ *
+ *  @param request      请求
+ *  @param fileDir  文件存储目录(默认存储目录为Download)
+ *  @param progress 文件下载的进度信息
+ *  @param success  下载成功的回调(回调参数filePath:文件的路径)
+ *  @param failure  下载失败的回调
+ *
+ *  @return 返回NSURLSessionDownloadTask实例，可用于暂停继续，暂停调用suspend方法，开始下载调用resume方法
+ */
++ (__kindof NSURLSessionTask *)downloadWithRequest:(NSURLRequest *)request
+                                       fileDir:(NSString *)fileDir
+                                      progress:(PPHttpProgress)progress
+                                       success:(void(^)(NSString *filePath))success
+                                       failure:(PPHttpRequestFailed)failure;
 
 /*
  **************************************  说明  **********************************************

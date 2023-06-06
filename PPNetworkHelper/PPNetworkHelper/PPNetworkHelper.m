@@ -387,10 +387,11 @@ static AFHTTPSessionManager *_sessionManager;
 }
 
 + (__kindof NSURLSessionTask *)downloadWithRequest:(NSURLRequest *)request
-                                       fileDir:(NSString *)fileDir
-                                      progress:(PPHttpProgress)progress
-                                       success:(void(^)(NSString *filePath))success
-                                       failure:(PPHttpRequestFailed)failure{
+                                           fileDir:(NSString *)fileDir
+                                          fileName:(NSString *)fileName
+                                          progress:(PPHttpProgress)progress
+                                           success:(void(^)(NSString *filePath))success
+                                           failure:(PPHttpRequestFailed)failure{
     NSURLSessionDownloadTask *downloadTask = [_sessionManager downloadTaskWithRequest:request progress:^(NSProgress * _Nonnull downloadProgress) {
         //下载进度
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -404,7 +405,7 @@ static AFHTTPSessionManager *_sessionManager;
         //创建Download目录
         [fileManager createDirectoryAtPath:downloadDir withIntermediateDirectories:YES attributes:nil error:nil];
         //拼接文件路径
-        NSString *filePath = [downloadDir stringByAppendingPathComponent:response.suggestedFilename];
+        NSString *filePath = [downloadDir stringByAppendingPathComponent:fileName ? fileName : response.suggestedFilename];
         
         //返回文件位置的URL路径
         return [NSURL fileURLWithPath:filePath];
